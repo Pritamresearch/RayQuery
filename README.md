@@ -154,16 +154,16 @@ Evaluated on the multi-camera **OPV2V** benchmark using the **Pretrained ResNet-
 | Top-$K$ Transmitted | Bandwidth (KB/frame) | AP@0.3 (%) | AP@0.5 (%) | AP@0.7 (%) | Operational Regime |
 | :---: | :---: | :---: | :---: | :---: | :--- |
 | **0** | **0.00 KB** | 0.00% | 0.00% | 0.00% | *Single-Vehicle Baseline (No Fusion)* |
-| **5** | **0.78 KB** | 2.52% | 0.79% | 0.06% | Rapid un-occlusion gain (+4.4x vs scratch) |
-| **10** | **1.56 KB** | 3.36% | 1.39% | 0.50% | Progressive cross-camera refinement |
-| **20** | **3.12 KB** | **6.12%** | **2.07%** | **0.40%** | **Optimal Pareto Knee Point (Highest Accuracy & Lowest Bandwidth)** |
-| **30** | **4.69 KB** | 4.70% | 1.34% | 0.17% | Stable collaboration |
-| **50** | **7.81 KB** | 4.73% | 1.67% | 0.23% | Noise tail begins |
-| **100** | **15.62 KB** | 3.23% | 1.06% | 0.02% | *Dense broadcast (Dilution / -47% degradation)* |
+| **5** | **0.78 KB** | 2.49% | 0.79% | 0.06% | Rapid un-occlusion gain |
+| **10** | **1.56 KB** | 3.04% | 1.39% | 0.50% | Progressive cross-camera refinement |
+| **20** | **3.12 KB** | **6.73%** | **2.04%** | **0.33%** | **Optimal Pareto Knee Point (Highest Accuracy & Lowest Bandwidth)** |
+| **30** | **4.69 KB** | 4.83% | 1.29% | 0.18% | Stable collaboration |
+| **50** | **7.81 KB** | 4.79% | 1.74% | 0.29% | Noise tail begins |
+| **100** | **15.62 KB** | 3.42% | 1.07% | 0.02% | *Dense broadcast (Dilution / -49% degradation)* |
 
 ### Empirical Findings:
-* **The Inverted-U Dilution Proof:** Transmitting all 100 queries indiscriminately ($K=100$) drops AP@0.3 by nearly half (**from 6.12% down to 3.23%**), providing direct mathematical and empirical proof that without depth-uncertainty gating, low-quality camera queries act as noise and degrade perception.
-* **Peak at 3.12 KB/frame:** Peak 3D detection performance is achieved at just **Top-20 queries (3.12 KB)**, achieving a **99% bandwidth reduction** over standard intermediate BEV feature methods (200–400 KB).
+* **The Inverted-U Dilution Proof:** Transmitting all 100 queries indiscriminately ($K=100$) causes AP@0.3 to drop by nearly half (**from 6.73% down to 3.42%**), providing direct mathematical and empirical proof that without depth-uncertainty gating, low-quality camera queries act as noise and degrade perception.
+* **Peak at 3.12 KB/frame:** Final converged peak 3D detection performance is achieved at just **Top-20 queries (3.12 KB)**, achieving a **99% bandwidth reduction** over standard intermediate BEV feature methods (200–400 KB).
 
 Generated paper figures:
 * **Vector PDF:** [`plots/fig_accuracy_bandwidth.pdf`](plots/fig_accuracy_bandwidth.pdf)
