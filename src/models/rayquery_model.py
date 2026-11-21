@@ -23,11 +23,17 @@ class RayQueryDetector(nn.Module):
         self.final_cls = nn.Linear(cfg.feat_dim, cfg.num_classes)
         self.final_reg = nn.Linear(cfg.feat_dim, 7) # (dx, dy, dz, l, w, h, yaw)
         
-    def forward(self, batch_data: dict, top_k_transmit: int = None):
+    def forward(self, batch_data: dict, top_k_transmit: int = None,
+                alpha_override: float = None, use_epistemic_gate: bool = True,
+                use_demand_guided: bool = True, pose_noise_std: float = 0.0):
         """
         Args:
             batch_data: Dict with 'images', 'intrinsics', 'extrinsics', 'rel_poses', 'n_agents'
             top_k_transmit: Number of queries transmitted per collaborator (for bandwidth sweeping)
+            alpha_override: Overrides uncertainty penalty weight (for alpha ablation)
+            use_epistemic_gate: Enables/disables anti-dilution gating (for gating ablation)
+            use_demand_guided: Enables/disables demand-field matching (for demand ablation)
+            pose_noise_std: Standard deviation of Gaussian pose noise added to relative coordinates (for robustness)
         """
         if top_k_transmit is None:
             top_k_transmit = self.cfg.topk_transmit
@@ -84,7 +90,8 @@ class RayQueryDetector(nn.Module):
         for j in range(1, n_agents):
             # Select top-K queries based on Ray-Depth Uncertainty & Utility
             selected_idx, _ = self.selector(
-                agent_scores[j], agent_uncertainties[j], agent_boxes[j], top_k=top_k_transmit
+                agent_scores[j], agent_uncertainties[j], agent_boxes[j],
+                top_k=top_k_transmit, alpha_override=alpha_override, use_demand=use_demand_guided
             )
             
             q_selected = agent_queries[j][selected_idx]
@@ -93,6 +100,11 @@ class RayQueryDetector(nn.Module):
             
             # Coordinate transformation from collaborator frame into Ego frame
             dx, dy, dyaw = rel_poses[j]
+            if pose_noise_std > 0.0:
+                dx = dx + torch.randn(1, device=dx.device).squeeze() * pose_noise_std
+                dy = dy + torch.randn(1, device=dy.device).squeeze() * pose_noise_std
+                dyaw = dyaw + torch.randn(1, device=dyaw.device).squeeze() * (pose_noise_std * 0.05)
+                
             cos_y = torch.cos(dyaw)
             sin_y = torch.sin(dyaw)
             
@@ -117,7 +129,8 @@ class RayQueryDetector(nn.Module):
             all_collab_queries = torch.cat(transmitted_queries, dim=0)
             all_collab_uncertainties = torch.cat(transmitted_uncertainties, dim=0)
             fused_ego_queries = self.fusion(
-                ego_queries, ego_uncertainties, all_collab_queries, all_collab_uncertainties
+                ego_queries, ego_uncertainties, all_collab_queries, all_collab_uncertainties,
+                use_gate=use_epistemic_gate
             )
         else:
             fused_ego_queries = ego_queries

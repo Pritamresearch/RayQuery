@@ -20,23 +20,24 @@ class DemandSupplyQuerySelector(nn.Module):
         
     def forward(self, scores: torch.Tensor, ray_uncertainty: torch.Tensor,
                 ref_boxes: torch.Tensor, ego_demand_mask: torch.Tensor = None,
-                top_k: int = 30):
+                top_k: int = 30, alpha_override: float = None, use_demand: bool = True):
         """
         Computes the utility:
             U_q = Score(q) * exp(-alpha * Uncertainty(q)) * DemandFactor(q)
         """
-        # Ray-Depth Confidence Factor
-        depth_cert = torch.exp(-self.alpha * ray_uncertainty) # in [0, 1]
+        alpha = self.alpha if alpha_override is None else alpha_override
+        # Ray-Depth Confidence Factor (if alpha == 0, ignores depth uncertainty)
+        if alpha > 0:
+            depth_cert = torch.exp(-alpha * ray_uncertainty)
+        else:
+            depth_cert = torch.ones_like(scores)
         
-        # Demand Factor (defaults to 1.0 if not using demand mask)
+        # Demand Factor
         demand_factor = torch.ones_like(scores)
-        if ego_demand_mask is not None:
-            # Query centers: (cx, cy)
+        if use_demand and ego_demand_mask is not None:
             cx = ref_boxes[:, 0]
             cy = ref_boxes[:, 1]
-            # Spatial demand check: check if in receiver blind zone
             dist_to_ego = torch.sqrt(cx**2 + cy**2)
-            # Higher demand for distant or occluded zones
             demand_factor = torch.clamp(dist_to_ego / 30.0, min=0.5, max=1.5)
             
         utility = scores * depth_cert * demand_factor
@@ -68,13 +69,15 @@ class EpistemicAntiDilutionCrossAttention(nn.Module):
         self.norm = nn.LayerNorm(feat_dim)
         
     def forward(self, ego_queries: torch.Tensor, ego_uncertainty: torch.Tensor,
-                collab_queries: torch.Tensor, collab_uncertainty: torch.Tensor):
+                collab_queries: torch.Tensor, collab_uncertainty: torch.Tensor,
+                use_gate: bool = True):
         """
         Args:
             ego_queries: (N_ego, feat_dim)
             ego_uncertainty: (N_ego,)
             collab_queries: (N_collab, feat_dim)
             collab_uncertainty: (N_collab,)
+            use_gate: if False, performs unweighted standard cross-attention (ablation mode)
         Returns:
             fused_queries: (N_ego, feat_dim)
         """
@@ -88,6 +91,10 @@ class EpistemicAntiDilutionCrossAttention(nn.Module):
         
         attn_out, _ = self.mha(q, k, v)
         attn_out = attn_out.squeeze(0)    # (N_ego, feat_dim)
+        
+        if not use_gate:
+            # Ablation: unweighted cross-attention (subject to dilution trap)
+            return self.norm(ego_queries + attn_out)
         
         # Epistemic Uncertainty Gating:
         # Compare relative certainty: ego_cert vs mean collaborator cert
