@@ -49,9 +49,9 @@ class RayQueryConfig:
     
     # --- Training & Optimization ---
     batch_size: int = 1
-    lr: float = 2e-4
+    lr: float = 1e-4
     weight_decay: float = 1e-4
-    epochs: int = 40
+    epochs: int = 80
     num_classes: int = 1  # 3D vehicle detection
     
     # Loss weights
