@@ -165,10 +165,15 @@ Evaluated on the multi-camera **OPV2V** benchmark using the **Pretrained ResNet-
 * **The Inverted-U Dilution Proof:** Transmitting all 100 queries indiscriminately ($K=100$) causes AP@0.3 to drop by nearly half (**from 6.73% down to 3.42%**), providing direct mathematical and empirical proof that without depth-uncertainty gating, low-quality camera queries act as noise and degrade perception.
 * **Peak at 3.12 KB/frame:** Final converged peak 3D detection performance is achieved at just **Top-20 queries (3.12 KB)**, achieving a **99% bandwidth reduction** over standard intermediate BEV feature methods (200–400 KB).
 
-Generated paper figures:
-* **Vector PDF:** [`plots/fig_accuracy_bandwidth.pdf`](plots/fig_accuracy_bandwidth.pdf)
-* **High-Res Plot:** [`plots/fig_accuracy_bandwidth.png`](plots/fig_accuracy_bandwidth.png)
-* **CSV Table:** [`results/curves/accuracy_bandwidth.csv`](results/curves/accuracy_bandwidth.csv)
+Generated paper figures & diagnostics:
+* **Accuracy vs. Bandwidth Curve:**
+  * Vector PDF: [`plots/fig_accuracy_bandwidth.pdf`](plots/fig_accuracy_bandwidth.pdf)
+  * High-Res PNG: [`plots/fig_accuracy_bandwidth.png`](plots/fig_accuracy_bandwidth.png)
+  * Numerical CSV: [`results/curves/accuracy_bandwidth.csv`](results/curves/accuracy_bandwidth.csv)
+* **Training Diagnostics & Loss Decomposition (4-Panel Figure):**
+  * Vector PDF: [`plots/fig_training_diagnostics.pdf`](plots/fig_training_diagnostics.pdf)
+  * High-Res PNG: [`plots/fig_training_diagnostics.png`](plots/fig_training_diagnostics.png)
+  * Training Loss CSV: [`results/curves/training_loss_history.csv`](results/curves/training_loss_history.csv)
 
 ---
 
