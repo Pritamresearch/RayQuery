@@ -11,14 +11,22 @@ Official PyTorch implementation of **RayQuery**, an ultra-low-bandwidth, anti-di
 ---
 
 ## Table of Contents
-- [1. Scientific Motivation & Problem Statement](#1-scientific-motivation--problem-statement)
-- [2. Technical Architecture](#2-technical-architecture)
+- [1. Scientific Motivation & Problem Statement](#1-scientific-motivation--problem-statement) — *(Full Document: [`docs/PROBLEM_STATEMENT.md`](docs/PROBLEM_STATEMENT.md))*
+- [2. Technical Architecture & Methodology](#2-technical-architecture) — *(Full Document: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md))*
 - [3. Communication Protocol: Demand–Supply Handshake](#3-communication-protocol-demand-supply-handshake)
-- [4. Real-World Applications & Use Cases](#4-real-world-applications--use-cases)
-- [5. Empirical Benchmark Results (OPV2V)](#5-empirical-benchmark-results-opv2v)
+- [4. Real-World Applications & Safety Scenarios](#4-real-world-applications--use-cases) — *(Full Document: [`docs/APPLICATIONS.md`](docs/APPLICATIONS.md))*
+- [5. Empirical Benchmark Results (OPV2V)](#5-empirical-benchmark-results-opv2v) — *(Full Document: [`docs/RESULTS.md`](docs/RESULTS.md))*
 - [6. Repository Structure](#6-repository-structure)
 - [7. Installation & Quickstart](#7-installation--quickstart)
 - [8. Citation & Contact](#8-citation--contact)
+
+---
+
+### Detailed Research Documentation:
+* 📄 **[Problem Statement & Gap Analysis](docs/PROBLEM_STATEMENT.md):** Theoretical limitations of BEV sharing & ray-depth ambiguity traps.
+* 📐 **[Methodology & Architecture Walkthrough](docs/METHODOLOGY.md):** ResNet backbone, entropy calculation, epistemic gating, and loss formulations.
+* 📊 **[Experimental Results & Training Diagnostics](docs/RESULTS.md):** Benchmark tables, Inverted-U Pareto curve, and 80-epoch training curves.
+* 🚗 **[Real-World Applications & V2X Integration](docs/APPLICATIONS.md):** Intersection blind spots, highway platooning, and SAE J2735 / ETSI CAM packet accounting.
 
 ---
 
